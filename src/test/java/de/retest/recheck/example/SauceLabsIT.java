@@ -13,7 +13,7 @@ import de.retest.recheck.Properties;
 import de.retest.recheck.Recheck;
 import de.retest.recheck.RecheckImpl;
 
-class SauceLabsMobilesTest {
+class SauceLabsIT {
 
 	private static final String sauceUserName = "roessler1";
 	private static final String sauceAccessKey = "49342fea-55f6-4c60-9402-aac73de16828";
@@ -28,17 +28,24 @@ class SauceLabsMobilesTest {
 	private Recheck re;
 
 	@Test
-	public void checkSamsungGalaxy() throws Exception {
+	public void checkChrome74_Win10() throws Exception {
 		re = new RecheckImpl();
 		re.startTest(testName);
-		DesiredCapabilities capabilities = DesiredCapabilities.android();
-		capabilities.setCapability("username", sauceUserName);
-		capabilities.setCapability("accessKey", sauceAccessKey);
-		capabilities.setCapability("deviceName","Samsung Galaxy S8 Plus GoogleAPI Emulator");
-		capabilities.setCapability("deviceOrientation", "portrait");
-		capabilities.setCapability("browserName", "Chrome");
-		capabilities.setCapability("platformVersion", "8.0");
-		capabilities.setCapability("platformName","Android");
+		DesiredCapabilities capabilities = createCapabilities("Chrome", "74.0", "Windows 10");
+		driver = new RemoteWebDriver(new URL("http://ondemand.eu-central-1.saucelabs.com/wd/hub"), capabilities);
+
+		driver.get(targetUrl);
+		Thread.sleep(1000);
+		re.check(driver, checkName);
+
+		re.capTest();
+	}
+
+	@Test
+	public void checkFirefox_Windows10() throws Exception {
+		re = new RecheckImpl();
+		re.startTest(testName);
+		DesiredCapabilities capabilities = createCapabilities("Firefox", "67.0", "Windows 10");
 		driver = new RemoteWebDriver(new URL(remoteUrl), capabilities);
 
 		driver.get(targetUrl);
@@ -49,10 +56,24 @@ class SauceLabsMobilesTest {
 	}
 
 	@Test
-	public void checkIPhone8Plus() throws Exception {
+	public void checkSafari11_MacOs10() throws Exception {
 		re = new RecheckImpl();
 		re.startTest(testName);
-		DesiredCapabilities capabilities = createCapabilities("iPhone", "iPhone 8 Plus", "11");
+		DesiredCapabilities capabilities = createCapabilities("Safari", "11.1", "macOS 10.13");
+		driver = new RemoteWebDriver(new URL(remoteUrl), capabilities);
+
+		driver.get(targetUrl);
+		Thread.sleep(1000);
+		re.check(driver, checkName);
+
+		re.capTest();
+	}
+
+	@Test
+	public void checkIE11_Windows10() throws Exception {
+		re = new RecheckImpl();
+		re.startTest(testName);
+		DesiredCapabilities capabilities = createCapabilities("internet explorer", "11.285", "Windows 10");
 		driver = new RemoteWebDriver(new URL(remoteUrl), capabilities);
 
 		driver.get(targetUrl);
@@ -74,16 +95,15 @@ class SauceLabsMobilesTest {
 		System.setProperty(Properties.ELEMENT_MATCH_THRESHOLD_PROPERTY, "0.0");
 	}
 
-	private static DesiredCapabilities createCapabilities(String browser, String device, String os) {
+	private static DesiredCapabilities createCapabilities(String browser, String browserVersion, String os) {
 		DesiredCapabilities capabilities = new DesiredCapabilities();
 		capabilities.setCapability("username", sauceUserName);
 		capabilities.setCapability("accessKey", sauceAccessKey);
-		capabilities.setCapability("deviceOrientation", "portrait"); // "landscape"
 		capabilities.setCapability("browserName", browser);
-		capabilities.setCapability("device", device);
-		capabilities.setCapability("os_version", os);
+		capabilities.setCapability("version", browserVersion);
+		capabilities.setCapability("screenResolution", "1600x1200");
+		capabilities.setCapability("platform", os);
 		capabilities.setCapability("name", testName);
-
 		return capabilities;
 	}
 }
