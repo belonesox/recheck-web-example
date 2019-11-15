@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 
 import de.retest.recheck.Recheck;
@@ -19,7 +20,15 @@ class ExplicitChecksTest {
 	@BeforeEach
 	public void setup() {
 		re = new RecheckImpl();
-		driver =  new ChromeDriver();
+		final ChromeOptions opts = new ChromeOptions();
+		opts.addArguments(
+				// Enable headless mode for faster execution.
+				"--headless",
+				// Use Chrome in container-based Travis CI enviroment (see https://docs.travis-ci.com/user/chrome#Sandboxing).
+				"--no-sandbox",
+				// Fix window size for stable results.
+				"--window-size=1200,800" );
+		driver = new ChromeDriver( opts );
 	}
 
 	@Test
